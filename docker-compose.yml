@@ -1,1 +1,14 @@
-version: "3"
+version: '3.3'
+services:
+  db:
+    image: mariadb:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: echo
+    ports:
+      - target: 3306
+        published: 3306
+        protocol: tcp
+        mode: host
