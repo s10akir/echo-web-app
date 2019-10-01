@@ -1,5 +1,17 @@
 version: '3.3'
 services:
+  app:
+    build: .
+    volumes:
+      - type: bind
+        source: .
+        target: /go/src/github.com/s10akir/echo-web-app
+    ports:
+      - target: 8080
+        published: 8080
+        protocol: tcp
+        mode: host
+
   db:
     image: mariadb:latest
     environment:
