@@ -1,0 +1,21 @@
+test:
+    driver: mymysql
+    open: tcp:0.0.0.0:3306*echo/user/password
+
+development:
+    driver: mymysql
+    open: tcp:0.0.0.0:3306*echo/user/password
+
+production:
+    driver: mymysql
+    open: tcp:0.0.0.0:3306*echo/user/password
+
+customimport:
+    driver: customdriver
+    open: customdriver open
+    import: github.com/custom/driver
+    dialect: mysql
+
+environment_variable_config:
+    driver: $DB_DRIVER
+    open: $DATABASE_URL

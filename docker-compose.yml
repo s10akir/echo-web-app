@@ -11,6 +11,8 @@ services:
         published: 8080
         protocol: tcp
         mode: host
+    depends_on:
+      - db
 
   db:
     image: mariadb:latest
