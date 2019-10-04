@@ -9,31 +9,29 @@ import (
 )
 
 func (r *repository) CreateNewTask(title string, content string) (*models.Task, error) {
-	id, err := r.generateID()
-
-	if err != nil {
-		return nil, err
-	}
-
-	now := time.Now()
-	_, err = r.db.Exec(
+	result, err := r.db.Exec(
 		`
-		INSERT INTO tasks(id, title, content, created_at, updated_at)
-			VALUES(?, ?, ?, ?, ?)
+		INSERT INTO tasks(title, content)
+			VALUES(?, ?)
 		`,
-		id, title, content, now, now,
+		title, content,
 	)
 
 	if err != nil {
 		return nil, err
 	}
-	return &models.Task{
-		ID:        id,
-		Title:     title,
-		Content:   content,
-		CreatedAt: now,
-		UpdatedAt: now,
-	}, nil
+
+	id, err := result.LastInsertId()
+	if err != nil {
+		return nil, err
+	}
+
+	task, err := r.FindTaskByID(uint64(id))
+	if err != nil {
+		return nil, err
+	}
+
+	return task, err
 }
 
 func (r *repository) FindTaskByID(id uint64) (*models.Task, error) {
