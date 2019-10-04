@@ -20,7 +20,7 @@ type Repository interface {
 }
 
 func New() (Repository, error) {
-	db, err := sqlx.Connect("mysql", "user:password@tcp(0.0.0.0)/echo?parseTime=True")
+	db, err := sqlx.Connect("mysql", "user:password@tcp(db)/echo?parseTime=True")
 
 	if err != nil {
 		return nil, err
