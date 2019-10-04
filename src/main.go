@@ -6,11 +6,15 @@ import (
 	"github.com/labstack/echo"
 
 	"github.com/s10akir/echo-web-app/src/controllers"
+	"github.com/s10akir/echo-web-app/src/repository"
 )
 
 const PORT = ":8080"
 
 func main() {
+	// debug
+	repo, _ := repository.New()
+
 	app := echo.New()
 
 	app.GET("/", func(context echo.Context) error {
@@ -19,7 +23,7 @@ func main() {
 
 	task := app.Group("/task")
 	{
-		taskController := controller.TaskController{}
+		taskController := controller.TaskController{Repo: repo}
 		task.GET("", taskController.Index)
 		task.POST("", taskController.New)
 		task.GET("/:id", taskController.Show)
@@ -28,4 +32,6 @@ func main() {
 	}
 
 	app.Start(PORT)
+
+	defer repo.Close()
 }
