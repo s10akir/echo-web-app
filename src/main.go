@@ -10,6 +10,7 @@ import (
 	"github.com/tylerb/graceful"
 
 	"github.com/s10akir/echo-web-app/src/controllers"
+	"github.com/s10akir/echo-web-app/src/middleware"
 	"github.com/s10akir/echo-web-app/src/repository"
 )
 
@@ -59,7 +60,7 @@ func main() {
 		return context.String(http.StatusOK, "Hello World!")
 	})
 
-	task := app.Group("/task")
+	task := app.Group("/task", middleware.Authenticator)
 	{
 		taskController := controller.TaskController{Repo: repo}
 		task.GET("", taskController.Index)
