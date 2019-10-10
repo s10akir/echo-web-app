@@ -3,7 +3,9 @@ package controller
 import (
 	"encoding/json"
 	"github.com/s10akir/echo-web-app/src/models"
+	"log"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/labstack/echo"
@@ -15,7 +17,7 @@ type TaskController struct {
 	Repo repository.Repository
 }
 
-// TODO: 各アクションで行っているエラー処理、こういうときこそpanic()をつかうべきなのではという感じがする
+var warn = log.New(os.Stderr, "[Error] ", log.LstdFlags|log.LUTC)
 
 func (taskController TaskController) Index(context echo.Context) error {
 	return context.String(http.StatusOK, "task#index")
@@ -29,18 +31,21 @@ func (taskController TaskController) New(context echo.Context) error {
 
 	value := new(param)
 	if err := context.Bind(value); err != nil {
-		return err
+		handleError(err)
+
+		if err := context.String(http.StatusOK, "error"); err != nil {
+			return err
+		}
 	}
 
 	task, err := taskController.Repo.CreateNewTask(value.Title, value.Content)
 	if err != nil {
-		// TODO: ここはcontext.String()のエラーを優先してよいのだろうか
-		// どちらかを捨てるよりは両方エラー出力したいが、エラー処理はmain()に集約したい気もする
+		handleError(err)
+
 		if err := context.String(http.StatusOK, "error"); err != nil {
 			return err
 		}
 
-		return err
 	}
 
 	var jsonByte []byte
@@ -48,8 +53,8 @@ func (taskController TaskController) New(context echo.Context) error {
 		var err error
 
 		if jsonByte, err = json.Marshal(task); err != nil {
-			// TODO: ここはcontext.String()のエラーを優先してよいのだろうか
-			// どちらかを捨てるよりは両方エラー出力したいが、エラー処理はmain()に集約したい気もする
+			handleError(err)
+
 			if err := context.String(http.StatusOK, "error"); err != nil {
 				return err
 			}
@@ -63,9 +68,10 @@ func (taskController TaskController) Show(context echo.Context) error {
 	var id int
 	{
 		var err error
+
 		if id, err = strconv.Atoi(context.Param("id")); err != nil {
-			// TODO: ここはcontext.String()のエラーを優先してよいのだろうか
-			// どちらかを捨てるよりは両方エラー出力したいが、エラー処理はmain()に集約したい気もする
+			handleError(err)
+
 			if err := context.String(http.StatusOK, "error"); err != nil {
 				return err
 			}
@@ -77,8 +83,8 @@ func (taskController TaskController) Show(context echo.Context) error {
 		var err error
 
 		if task, err = taskController.Repo.FindTaskByID(id); err != nil {
-			// TODO: ここはcontext.String()のエラーを優先してよいのだろうか
-			// どちらかを捨てるよりは両方エラー出力したいが、エラー処理はmain()に集約したい気もする
+			handleError(err)
+
 			if err := context.String(http.StatusOK, "error"); err != nil {
 				return err
 			}
@@ -90,8 +96,8 @@ func (taskController TaskController) Show(context echo.Context) error {
 		var err error
 
 		if jsonByte, err = json.Marshal(task); err != nil {
-			// TODO: ここはcontext.String()のエラーを優先してよいのだろうか
-			// どちらかを捨てるよりは両方エラー出力したいが、エラー処理はmain()に集約したい気もする
+			handleError(err)
+
 			if err := context.String(http.StatusOK, "error"); err != nil {
 				return err
 			}
@@ -113,8 +119,8 @@ func (taskController TaskController) Update(context echo.Context) error {
 		var err error
 
 		if id, err = strconv.Atoi(context.Param("id")); err != nil {
-			// TODO: ここはcontext.String()のエラーを優先してよいのだろうか
-			// どちらかを捨てるよりは両方エラー出力したいが、エラー処理はmain()に集約したい気もする
+			handleError(err)
+
 			if err := context.String(http.StatusOK, "error"); err != nil {
 				return err
 			}
@@ -123,16 +129,16 @@ func (taskController TaskController) Update(context echo.Context) error {
 
 	value := new(param)
 	if err := context.Bind(value); err != nil {
-		// TODO: ここはcontext.String()のエラーを優先してよいのだろうか
-		// どちらかを捨てるよりは両方エラー出力したいが、エラー処理はmain()に集約したい気もする
+		handleError(err)
+
 		if err := context.String(http.StatusOK, "error"); err != nil {
 			return err
 		}
 	}
 
 	if err := taskController.Repo.UpdateTask(id, value.Title, value.Content); err != nil {
-		// TODO: ここはcontext.String()のエラーを優先してよいのだろうか
-		// どちらかを捨てるよりは両方エラー出力したいが、エラー処理はmain()に集約したい気もする
+		handleError(err)
+
 		if err := context.String(http.StatusOK, "error"); err != nil {
 			return err
 		}
@@ -146,8 +152,8 @@ func (taskController TaskController) Delete(context echo.Context) error {
 	{
 		var err error
 		if id, err = strconv.Atoi(context.Param("id")); err != nil {
-			// TODO: ここはcontext.String()のエラーを優先してよいのだろうか
-			// どちらかを捨てるよりは両方エラー出力したいが、エラー処理はmain()に集約したい気もする
+			handleError(err)
+
 			if err := context.String(http.StatusOK, "error"); err != nil {
 				return err
 			}
@@ -156,8 +162,8 @@ func (taskController TaskController) Delete(context echo.Context) error {
 
 	if err := taskController.Repo.DeleteTask(id); err != nil {
 		if id, err = strconv.Atoi(context.Param("id")); err != nil {
-			// TODO: ここはcontext.String()のエラーを優先してよいのだろうか
-			// どちらかを捨てるよりは両方エラー出力したいが、エラー処理はmain()に集約したい気もする
+			handleError(err)
+
 			if err := context.String(http.StatusOK, "error"); err != nil {
 				return err
 			}
@@ -165,4 +171,8 @@ func (taskController TaskController) Delete(context echo.Context) error {
 	}
 
 	return context.String(http.StatusOK, "delete success.")
+}
+
+func handleError(err error) {
+	warn.Print(err)
 }
