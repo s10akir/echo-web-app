@@ -39,7 +39,7 @@ func (taskController TaskController) New(context echo.Context) error {
 }
 
 func (taskController TaskController) Show(context echo.Context) error {
-	id, _ := strconv.ParseUint(context.Param("id"), 10, 64)
+	id, _ := strconv.Atoi(context.Param("id"))
 	task, err := taskController.Repo.FindTaskByID(id)
 
 	if err != nil {
@@ -53,12 +53,12 @@ func (taskController TaskController) Show(context echo.Context) error {
 
 func (taskController TaskController) Update(context echo.Context) error {
 	type param struct {
-		Id      uint64 `json:"id"`
+		Id      int    `json:"id"`
 		Title   string `json:"title"`
 		Content string `json:"content"`
 	}
 
-	id, _ := strconv.ParseUint(context.Param("id"), 10, 64)
+	id, _ := strconv.Atoi(context.Param("id"))
 	value := new(param)
 	context.Bind(value)
 
@@ -73,7 +73,7 @@ func (taskController TaskController) Update(context echo.Context) error {
 }
 
 func (taskController TaskController) Delete(context echo.Context) error {
-	id, _ := strconv.ParseUint(context.Param("id"), 10, 64)
+	id, _ := strconv.Atoi(context.Param("id"))
 	err := taskController.Repo.DeleteTask(id)
 
 	if err != nil {

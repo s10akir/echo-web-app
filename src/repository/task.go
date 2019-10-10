@@ -26,7 +26,7 @@ func (r *repository) CreateNewTask(title string, content string) (*models.Task, 
 		return nil, err
 	}
 
-	task, err := r.FindTaskByID(uint64(id))
+	task, err := r.FindTaskByID(int(id))
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +34,7 @@ func (r *repository) CreateNewTask(title string, content string) (*models.Task, 
 	return task, err
 }
 
-func (r *repository) FindTaskByID(id uint64) (*models.Task, error) {
+func (r *repository) FindTaskByID(id int) (*models.Task, error) {
 	var task models.Task
 	err := r.db.Get(
 		&task,
@@ -52,7 +52,7 @@ func (r *repository) FindTaskByID(id uint64) (*models.Task, error) {
 	return &task, nil
 }
 
-func (r *repository) UpdateTask(id uint64, title string, content string) error {
+func (r *repository) UpdateTask(id int, title string, content string) error {
 	now := time.Now()
 	_, err := r.db.Exec(
 		`
@@ -65,7 +65,7 @@ func (r *repository) UpdateTask(id uint64, title string, content string) error {
 	return err
 }
 
-func (r *repository) DeleteTask(id uint64) error {
+func (r *repository) DeleteTask(id int) error {
 	_, err := r.db.Exec(
 		`
 		DELETE FROM tasks
