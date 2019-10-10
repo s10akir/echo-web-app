@@ -33,18 +33,14 @@ func (taskController TaskController) New(context echo.Context) error {
 	if err := context.Bind(value); err != nil {
 		handleError(err)
 
-		if err := context.String(http.StatusOK, "error"); err != nil {
-			return err
-		}
+		return context.String(http.StatusBadRequest, "error")
 	}
 
 	task, err := taskController.Repo.CreateNewTask(value.Title, value.Content)
 	if err != nil {
 		handleError(err)
 
-		if err := context.String(http.StatusOK, "error"); err != nil {
-			return err
-		}
+		return context.String(http.StatusBadRequest, "error")
 
 	}
 
@@ -55,9 +51,7 @@ func (taskController TaskController) New(context echo.Context) error {
 		if jsonByte, err = json.Marshal(task); err != nil {
 			handleError(err)
 
-			if err := context.String(http.StatusOK, "error"); err != nil {
-				return err
-			}
+			return context.String(http.StatusBadRequest, "error")
 		}
 	}
 
@@ -72,9 +66,7 @@ func (taskController TaskController) Show(context echo.Context) error {
 		if id, err = strconv.Atoi(context.Param("id")); err != nil {
 			handleError(err)
 
-			if err := context.String(http.StatusOK, "error"); err != nil {
-				return err
-			}
+			return context.String(http.StatusBadRequest, "error")
 		}
 	}
 
@@ -85,9 +77,7 @@ func (taskController TaskController) Show(context echo.Context) error {
 		if task, err = taskController.Repo.FindTaskByID(id); err != nil {
 			handleError(err)
 
-			if err := context.String(http.StatusOK, "error"); err != nil {
-				return err
-			}
+			return context.String(http.StatusBadRequest, "error")
 		}
 	}
 
@@ -98,9 +88,7 @@ func (taskController TaskController) Show(context echo.Context) error {
 		if jsonByte, err = json.Marshal(task); err != nil {
 			handleError(err)
 
-			if err := context.String(http.StatusOK, "error"); err != nil {
-				return err
-			}
+			return context.String(http.StatusBadRequest, "error")
 		}
 	}
 
@@ -121,9 +109,7 @@ func (taskController TaskController) Update(context echo.Context) error {
 		if id, err = strconv.Atoi(context.Param("id")); err != nil {
 			handleError(err)
 
-			if err := context.String(http.StatusOK, "error"); err != nil {
-				return err
-			}
+			return context.String(http.StatusBadRequest, "error")
 		}
 	}
 
@@ -131,17 +117,13 @@ func (taskController TaskController) Update(context echo.Context) error {
 	if err := context.Bind(value); err != nil {
 		handleError(err)
 
-		if err := context.String(http.StatusOK, "error"); err != nil {
-			return err
-		}
+		return context.String(http.StatusBadRequest, "error")
 	}
 
 	if err := taskController.Repo.UpdateTask(id, value.Title, value.Content); err != nil {
 		handleError(err)
 
-		if err := context.String(http.StatusOK, "error"); err != nil {
-			return err
-		}
+		return context.String(http.StatusBadRequest, "error")
 	}
 
 	return context.String(http.StatusOK, "update success.")
@@ -154,9 +136,7 @@ func (taskController TaskController) Delete(context echo.Context) error {
 		if id, err = strconv.Atoi(context.Param("id")); err != nil {
 			handleError(err)
 
-			if err := context.String(http.StatusOK, "error"); err != nil {
-				return err
-			}
+			return context.String(http.StatusBadRequest, "error")
 		}
 	}
 
@@ -164,9 +144,7 @@ func (taskController TaskController) Delete(context echo.Context) error {
 		if id, err = strconv.Atoi(context.Param("id")); err != nil {
 			handleError(err)
 
-			if err := context.String(http.StatusOK, "error"); err != nil {
-				return err
-			}
+			return context.String(http.StatusBadRequest, "error")
 		}
 	}
 
