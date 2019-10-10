@@ -141,11 +141,7 @@ func (taskController TaskController) Delete(context echo.Context) error {
 	}
 
 	if err := taskController.Repo.DeleteTask(id); err != nil {
-		if id, err = strconv.Atoi(context.Param("id")); err != nil {
-			handleError(err)
-
-			return context.String(http.StatusBadRequest, "error")
-		}
+		return context.String(http.StatusBadRequest, "error")
 	}
 
 	return context.String(http.StatusOK, "delete success.")
