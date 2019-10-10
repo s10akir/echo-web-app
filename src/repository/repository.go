@@ -13,17 +13,23 @@ type repository struct {
 
 type Repository interface {
 	CreateNewTask(title string, content string) (*models.Task, error)
-	FindTaskByID(id uint64) (*models.Task, error)
-	UpdateTask(id uint64, title string, content string) error
-	DeleteTask(id uint64) error
+	FindTaskByID(id int) (*models.Task, error)
+	UpdateTask(id int, title string, content string) error
+	DeleteTask(id int) error
 	Close() error
 }
 
-func New() (Repository, error) {
-	db, err := sqlx.Connect("mysql", "user:password@tcp(db)/echo?parseTime=True")
+func New(driver string, dataSource string) (Repository, error) {
+	var db *sqlx.DB
+	{
+		var err error
 
-	if err != nil {
-		return nil, err
+		if db, err = sqlx.Connect(
+			driver,
+			dataSource,
+		); err != nil {
+			return nil, err
+		}
 	}
 
 	return &repository{db: db}, nil
@@ -33,8 +39,9 @@ func (repo *repository) Close() error {
 	return repo.db.Close()
 }
 
-func (repo *repository) generateID() (uint64, error) {
-	var id uint64
+func (repo *repository) generateID() (int, error) {
+	var id int
+
 	err := repo.db.Get(
 		&id,
 		`

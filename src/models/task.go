@@ -5,7 +5,7 @@ import (
 )
 
 type Task struct {
-	ID        uint64    `db:"id"`
+	ID        int       `db:"id"`
 	Title     string    `db:"title"`
 	Content   string    `db:"content"`
 	CreatedAt time.Time `db:"created_at"`
