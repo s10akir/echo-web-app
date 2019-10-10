@@ -65,7 +65,7 @@ func main() {
 		task.GET("", taskController.Index)
 		task.POST("", taskController.New)
 		task.GET("/:id", taskController.Show)
-		task.POST("/:id", taskController.Update)
+		task.PUT("/:id", taskController.Update)
 		task.DELETE("/:id", taskController.Delete)
 	}
 
