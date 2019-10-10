@@ -19,14 +19,14 @@ type Repository interface {
 	Close() error
 }
 
-func New() (Repository, error) {
+func New(driver string, dataSource string) (Repository, error) {
 	var db *sqlx.DB
 	{
 		var err error
 
 		if db, err = sqlx.Connect(
-			"mysql",
-			"user:password@tcp(db)/echo?parseTime=True",
+			driver,
+			dataSource,
 		); err != nil {
 			return nil, err
 		}

@@ -11,6 +11,8 @@ services:
         published: 8080
         protocol: tcp
         mode: host
+    environment:
+      - ECHO_ENV=development
     depends_on:
       - db
 
