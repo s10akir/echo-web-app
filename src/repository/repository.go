@@ -20,10 +20,16 @@ type Repository interface {
 }
 
 func New() (Repository, error) {
-	db, err := sqlx.Connect("mysql", "user:password@tcp(db)/echo?parseTime=True")
+	var db *sqlx.DB
+	{
+		var err error
 
-	if err != nil {
-		return nil, err
+		if db, err = sqlx.Connect(
+			"mysql",
+			"user:password@tcp(db)/echo?parseTime=True",
+		); err != nil {
+			return nil, err
+		}
 	}
 
 	return &repository{db: db}, nil
@@ -35,6 +41,7 @@ func (repo *repository) Close() error {
 
 func (repo *repository) generateID() (int, error) {
 	var id int
+
 	err := repo.db.Get(
 		&id,
 		`

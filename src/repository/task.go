@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"database/sql"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -8,35 +9,50 @@ import (
 	"github.com/s10akir/echo-web-app/src/models"
 )
 
-func (r *repository) CreateNewTask(title string, content string) (*models.Task, error) {
-	result, err := r.db.Exec(
-		`
+func (repo *repository) CreateNewTask(title string, content string) (*models.Task, error) {
+	var result sql.Result
+	{
+		var err error
+
+		if result, err = repo.db.Exec(
+			`
 		INSERT INTO tasks(title, content)
 			VALUES(?, ?)
 		`,
-		title, content,
-	)
-
-	if err != nil {
-		return nil, err
+			title, content,
+		); err != nil {
+			return nil, err
+		}
 	}
 
-	id, err := result.LastInsertId()
-	if err != nil {
-		return nil, err
+	var id int
+	{
+		var err error
+		var lastInsertedId int64
+
+		if lastInsertedId, err = result.LastInsertId(); err != nil {
+			return nil, err
+		}
+
+		id = int(lastInsertedId)
 	}
 
-	task, err := r.FindTaskByID(int(id))
-	if err != nil {
-		return nil, err
+	var task *models.Task
+	{
+		var err error
+
+		if task, err = repo.FindTaskByID(int(id)); err != nil {
+			return nil, err
+		}
 	}
 
-	return task, err
+	return task, nil
 }
 
-func (r *repository) FindTaskByID(id int) (*models.Task, error) {
+func (repo *repository) FindTaskByID(id int) (*models.Task, error) {
 	var task models.Task
-	err := r.db.Get(
+
+	if err := repo.db.Get(
 		&task,
 		// idはPrimary Keyなので常に一件しか帰ってこないことが保証できる
 		`
@@ -44,35 +60,39 @@ func (r *repository) FindTaskByID(id int) (*models.Task, error) {
 			WHERE id = ?
 		`,
 		id,
-	)
-
-	if err != nil {
+	); err != nil {
 		return nil, err
 	}
+
 	return &task, nil
 }
 
-func (r *repository) UpdateTask(id int, title string, content string) error {
+func (repo *repository) UpdateTask(id int, title string, content string) error {
 	now := time.Now()
-	_, err := r.db.Exec(
+
+	if _, err := repo.db.Exec(
 		`
 		UPDATE tasks SET title = ?, content = ?, updated_at = ?
 			WHERE id = ?
 		`,
 		title, content, now, id,
-	)
+	); err != nil {
+		return err
+	}
 
-	return err
+	return nil
 }
 
-func (r *repository) DeleteTask(id int) error {
-	_, err := r.db.Exec(
+func (repo *repository) DeleteTask(id int) error {
+	if _, err := repo.db.Exec(
 		`
 		DELETE FROM tasks
 		WHERE id = ?
 		`,
 		id,
-	)
+	); err != nil {
+		return err
+	}
 
-	return err
+	return nil
 }

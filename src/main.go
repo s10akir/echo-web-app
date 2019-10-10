@@ -23,8 +23,7 @@ func main() {
 	{
 		var err error
 
-		repo, err = repository.New()
-		if err != nil {
+		if repo, err = repository.New(); err != nil {
 			handleError(err)
 			// dbに接続できない以上継続不可なので強制終了
 			panic(err)
