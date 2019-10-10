@@ -1,7 +1,9 @@
 package main
 
 import (
+	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/labstack/echo"
@@ -14,10 +16,20 @@ import (
 const PORT = ":8080"
 const TIMEOUT = 30 * time.Second
 
+var warn = log.New(os.Stderr, "[Error] ", log.LstdFlags|log.LUTC)
+
 func main() {
-	// debug
-	repo, _ := repository.New()
-	defer repo.Close()
+	var repo repository.Repository
+	{
+		var err error
+
+		repo, err = repository.New()
+		if err != nil {
+			handleError(err)
+			// dbに接続できない以上継続不可なので強制終了
+			panic(err)
+		}
+	}
 
 	app := echo.New()
 	app.Server.Addr = PORT
@@ -36,5 +48,17 @@ func main() {
 		task.DELETE("/:id", taskController.Delete)
 	}
 
-	graceful.ListenAndServe(app.Server, TIMEOUT)
+	if err := graceful.ListenAndServe(app.Server, TIMEOUT); err != nil {
+		handleError(err)
+	}
+
+	defer func() {
+		if err := repo.Close(); err != nil {
+			handleError(err)
+		}
+	}()
+}
+
+func handleError(err error) {
+	warn.Print(err)
 }
