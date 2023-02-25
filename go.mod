@@ -10,6 +10,6 @@ require (
 	github.com/labstack/gommon v0.3.0 // indirect
 	github.com/stretchr/testify v1.4.0
 	github.com/tylerb/graceful v1.2.15
-	golang.org/x/crypto v0.0.0-20190927123631-a832865fa7ad // indirect
+	golang.org/x/crypto v0.1.0 // indirect
 	google.golang.org/appengine v1.6.5 // indirect
 )
